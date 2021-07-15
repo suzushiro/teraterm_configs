@@ -1,0 +1,52 @@
+;=================================================
+USERNAME = 'root'
+HOSTNAME = '192.168.0.31'
+PASSWDFILE = 'C:\dev\sshkey_passwd\sshlogin_passwd.dat'
+PORTNUMBER = '22'
+LOG_FILE = 'C:\dev\log\teraterm'
+;=================================================
+
+;; password include
+getpassword PASSWDFILE username userpasswd
+
+;; ssh connect command generate
+masg = hostname
+strconcat msg ':PORTNUMBER /ssh /auth=password /user='
+strconcat msg username
+strconcat msg '/passwd='
+;; strconcat msg '/keyfile='
+;; strconcat msg keyfile
+;; strconcat msg inputstr
+;; strconcat msg password
+
+;; ssh connect
+connect msg
+
+;; logsave folder config
+getdate DIR_NAME '%Y%m%d'
+strconcat LOG_FILE DIR_NAME
+
+;; logsave folder exist check
+foldersearch LOG_FILE
+if result 0 then
+   foldercreate LOG_FILE
+   if result <> 0 then
+      messagebox 'A folder could not be made.' 'Making error'
+      end
+   endif
+endif
+
+;; logfile name config
+strconcat LOG_FILE '\'
+strconcat LOG_FILE username
+strconcat LOG_FILE '@'
+strconcat LOG_FILE hostname
+getdate datetime   '-%Y%m5d_%H%M%S'
+strconcat LOG_FILE datetime
+strconcat LOG_FILE '.log'
+
+;; logging start
+logopen LOG_FILE 0 1 0 1 0 0 0
+
+;; macro end
+end
