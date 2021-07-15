@@ -1,52 +1,30 @@
 ;=================================================
-USERNAME = 'root'
-HOSTNAME = '192.168.0.31'
-PASSWDFILE = 'C:\dev\sshkey_passwd\sshlogin_passwd.dat'
+; 接続情報
+HOSTADDR = '192.168.33.100'
 PORTNUMBER = '22'
-LOG_FILE = 'C:\dev\log\teraterm'
+USERNAME = 'username'
+PASSWDFILE = 'C:\dev\sshkey_passwd\sshlogin_passwd.dat'
 ;=================================================
 
-;; password include
-getpassword PASSWDFILE username userpasswd
+; パスワード取得
+getpassword PASSWDFILE HOSTADDR passwd
 
-;; ssh connect command generate
-masg = hostname
-strconcat msg ':PORTNUMBER /ssh /auth=password /user='
-strconcat msg username
-strconcat msg '/passwd='
-;; strconcat msg '/keyfile='
-;; strconcat msg keyfile
-;; strconcat msg inputstr
-;; strconcat msg password
+; 処理ディレクトリを現在ディレクトリに変更
+; コマンドオプション組立て
+COMMAND = HOSTADDR
+strconcat COMMAND ':PORTNUMBER /ssh /2 /auth=password /user='
+strconcat COMMAND USERNAME
+strconcat COMMAND ' /passwd='
+strconcat COMMAND passwd
 
-;; ssh connect
-connect msg
+; 接続
+connect COMMAND
 
-;; logsave folder config
-getdate DIR_NAME '%Y%m%d'
-strconcat LOG_FILE DIR_NAME
+; 接続後処理
+wait '@'
 
-;; logsave folder exist check
-foldersearch LOG_FILE
-if result 0 then
-   foldercreate LOG_FILE
-   if result <> 0 then
-      messagebox 'A folder could not be made.' 'Making error'
-      end
-   endif
-endif
+; 別サーバへSSH
+sendln 'uname -n;date'
 
-;; logfile name config
-strconcat LOG_FILE '\'
-strconcat LOG_FILE username
-strconcat LOG_FILE '@'
-strconcat LOG_FILE hostname
-getdate datetime   '-%Y%m5d_%H%M%S'
-strconcat LOG_FILE datetime
-strconcat LOG_FILE '.log'
-
-;; logging start
-logopen LOG_FILE 0 1 0 1 0 0 0
-
-;; macro end
+; マクロ終了
 end
